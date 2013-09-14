@@ -7,9 +7,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import br.com.hider.valetine.dataaccess.DatabaseHelper;
 
+@SuppressWarnings("rawtypes")
 public abstract class Entity<E extends Entity> implements Serializable {
 
-    private static final String DATABASE_NAME = "valentine";
+	private static final long serialVersionUID = 7625371405535709007L;
+	
+	private static final String DATABASE_NAME = "valentine";
     private static final int DATABASE_VERSION = 1;
 
     protected SQLiteDatabase db;
