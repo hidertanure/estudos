@@ -1,6 +1,7 @@
 package br.com.hider.valetine.business;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
@@ -20,6 +21,7 @@ public class BusinessController {
         try{
             eventFilter.openDb(ctx);
             eventList = eventFilter.list(eventFilter);
+            Collections.sort(eventList);
         }catch(Exception ex){
             ex.printStackTrace();
         }finally {

@@ -6,7 +6,7 @@ import java.util.List;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-public class Event extends Entity<Event> {
+public class Event extends Entity<Event> implements Comparable<Event> {
 	
 	private static final long serialVersionUID = -646623509667887971L;
 
@@ -149,6 +149,14 @@ public class Event extends Entity<Event> {
 
         return lista;
 		
+	}
+
+	@Override
+	public int compareTo(Event another) {
+		if(another !=null){
+			return this.getEventTimeStamp().compareTo(another.getEventTimeStamp());
+		}
+		return -1;
 	}
 	
 }
