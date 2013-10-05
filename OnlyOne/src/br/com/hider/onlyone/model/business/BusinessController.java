@@ -46,14 +46,24 @@ public class BusinessController {
             messageAuthorDisplayName = raw.get(0);
         }else if(appType.equals(AppType.HANGOUTS)){
             messageAuthorDisplayName = raw.get(0);
-            messageAuthorExternalId = raw.get(1);
+            if(raw.size()>2){
+            	messageAuthorExternalId = raw.get(1);
+            }
         }
 
         String messageContent = "";
         if(appType.equals(AppType.WHATS)){
-            messageContent = raw.get(2);
+        	if(raw.size()>2){
+        		messageContent = raw.get(2);
+        	}else{
+        		messageContent = raw.get(1);
+        	}
         }else if(appType.equals(AppType.HANGOUTS)){
-            messageContent = raw.get(2);
+        	if(raw.size()>2){
+        		messageContent = raw.get(2);
+        	}else{
+        		messageContent = raw.get(1);
+        	}
         }
 
 
