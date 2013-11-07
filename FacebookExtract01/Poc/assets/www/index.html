@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Test Page</title>
+<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+<link rel="stylesheet"
+	href="jquery.mobile-1.3.2/jquery.mobile-1.3.2.min.css" />
+<script type="text/javascript" charset="utf-8" src="jquery-2.0.2.min.js"></script>
+<script type="text/javascript" charset="utf-8"
+	src="jquery.mobile-1.3.2/jquery.mobile-1.3.2.min.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+
+		    // Wait for device API libraries to load
+		    //
+		    document.addEventListener("deviceready", onDeviceReady, false);
+		
+		    // device APIs are available
+		    //
+		    function onDeviceReady() {
+		        navigator.geolocation.getCurrentPosition(onSuccess, onError, {maximumAge:300000, timeout:10000, enableHighAccuracy:true});
+		    }
+		
+		    // onSuccess Geolocation
+		    //
+		    function onSuccess(position) {
+		    	
+		        /*var element = document.getElementById('geolocation');
+		        element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
+		                            'Longitude: '          + position.coords.longitude             + '<br />' +
+		                            'Altitude: '           + position.coords.altitude              + '<br />' +
+		                            'Accuracy: '           + position.coords.accuracy              + '<br />' +
+		                            'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
+		                            'Heading: '            + position.coords.heading               + '<br />' +
+		                            'Speed: '              + position.coords.speed                 + '<br />' +
+		                            'Timestamp: '          + position.timestamp                    + '<br />';*/
+		                            
+		        var access_token = 'CAAC70pkYg1YBAG642HHfAae2GpwsgKrPoqJQhnTrVUwWQSKr2PxTRJMb5xOqqzbWqFAiNqsM3r7JFwpkzlmkrFZBzZAToHAaeEaTO1mAlDk534WZCPIvFXAYIjwe9UmVMWZBuZCZBndjQYU55iggEDZCsZCV0xgfmKrkSYrIqyrMzIxXI38viKzSpVYnPVcMWQOAJHkNccvjfQZDZD';
+			
+				var graphLink = 'https://graph.facebook.com/search?fields=name,talking_about_count,likes,category&limit=10000&offset=0&type=place&center='+position.coords.latitude+','+position.coords.longitude+'&distance=1000&access_token='+access_token;
+
+				graphLink = graphLink + (/\?/.test(graphLink) ? "&" : "?") + "callback=?"
+				$.getJSON(graphLink, function(data) {
+					cordova.exec(phoneSucess, onError, 'PocService', 'readPlaces', data.data);					
+				});
+		    }
+		    
+		    function phoneSucess(data){		    	
+		    	var nameBlock = $('#name-block');
+				var cIndex = 0;
+				$.each(data, function(x) {
+					var item = data[cIndex];
+					nameBlock.append('<li><a href="#"><!--<img src="../../_assets/img/apple.png">--><h2>'+item.name+'</h2><p>Talking About Count: '+item.talking_about_count+' - Likes: '+item.likes+'</p><!--<p class="ui-li-aside">desc2</p>--></a><!--<a href="#purchase" data-rel="popup" data-position-to="window" data-transition="pop">View</a>--></li>');
+					cIndex++;
+				});
+				nameBlock.listview('refresh');
+		    }
+		
+		    function onError(error) {
+		        console.log('code: '    + error.code    + '\nmessage: ' + error.message + '\n');
+		    }
+	
+	    </script>
+
+<script>
+			$( document ).ready(function() {
+			});
+		</script>
+</head>
+<body>
+	<div data-role="page" data-theme="a" id="demo-page" class="my-page"
+		data-url="demo-page">
+		<div data-role="header">
+			<h1>Places</h1>
+			<!--<a href="grid-listview.html" data-shadow="false" data-iconshadow="false" data-icon="arrow-l" data-iconpos="notext" data-rel="back" data-ajax="false">Back</a>-->
+		</div>
+		<!-- /header -->
+		<div data-role="content">
+
+			<!-- <p id="geolocation">Finding geolocation...</p> -->
+
+			<ul id="name-block" data-role="listview" data-filter=true
+				data-split-icon="gear" data-split-theme="d" data-inset="false">
+
+			</ul>
+		</div>
+		<!-- /content -->
+		<!-- <div data-role="footer" data-theme="none">
+			<h3>Places</h3>
+		</div> -->
+		<!-- /footer -->
+	</div>
+</body>
+</html>
