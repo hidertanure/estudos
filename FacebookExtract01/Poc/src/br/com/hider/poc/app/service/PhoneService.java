@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import br.com.hider.poc.domain.model.Place;
+import br.com.hider.poc.utils.WebUtils;
 
 public class PhoneService extends CordovaPlugin {
 
@@ -22,10 +23,16 @@ public class PhoneService extends CordovaPlugin {
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 		if (action.equals("readPlaces")) {
 			
-			JSONArray echo = this.sortPlaces(args);
+			Double latitude = args.getDouble(0);
+			Double longitude = args.getDouble(1);
+			Long distance = 2000L;
+			
+			List<Place> places = this.retriveNearPlaces(latitude, longitude, distance);
+			
+			JSONArray retorno = this.sortPlaces(places);
 
-			if (echo != null && echo.length() > 0) { 
-				callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, echo));
+			if (retorno != null && retorno.length() > 0) { 
+				callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, retorno));
 			} else {
 				callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
 			}
@@ -37,37 +44,57 @@ public class PhoneService extends CordovaPlugin {
 		return true;
 	}
 	
-	private JSONArray sortPlaces(JSONArray jArray) throws JSONException{
-		
-		List<Place> places = new ArrayList<Place>();
+	private List<Place> retriveNearPlaces(Double latitude, Double longitude, Long  distance){
 
-		for(int i=0; i < jArray.length(); i++) {
+		try{
+			String 	appId 		= "206513186046806";
+			String 	appSecret 	= "81839aa125591c89eb12344bf41b60b3";
+			Long 	limit 		= 50000L;
 
-			try{
+			String accessToken = WebUtils.readTextFromUrl("https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id="+appId+"&client_secret="+appSecret);
 
-				JSONObject jObject = jArray.getJSONObject(i);
-
-				Long id = jObject.getLong("id");
-
-				String name = jObject.getString("name");             
-				String category = jObject.getString("category");
-
-				Long talking_about_count = jObject.getLong("talking_about_count");
-				Long likes = jObject.has("likes")?jObject.getLong("likes"):0;
-
+			JSONObject result = WebUtils.readJsonFromUrl("https://graph.facebook.com/search?fields=name,talking_about_count,likes,category,location&limit="+limit+"&offset=0&type=place&center="+latitude+","+longitude+"&distance="+distance+"&"+accessToken);
+			
+			JSONArray itens = result.getJSONArray("data");
+			
+			List<Place> places = new ArrayList<Place>();
+			
+			for(int i = 0; i < itens.length(); i++){
+				
+				JSONObject item = itens.getJSONObject(i);
+				
+				String name = (item.has("name") ? item.getString("name") : null);
+				Long talking_about_count = (item.has("talking_about_count") ? item.getLong("talking_about_count") : null);
+				Long likes = (item.has("likes") ? item.getLong("likes") : null);
+				
+				//JSONObject location = (item.has("location") ? item.getJSONObject("location") : null);
+				
 				Place place = new Place();
-				place.setId(id);
-				place.setCategory(category);
 				place.setName(name);
 				place.setTalkAbout(talking_about_count);
 				place.setLikes(likes);
-
-				if(talking_about_count.intValue() > 300){
-					places.add(place);
-				}
 				
-			}catch(Exception ex){
-				ex.printStackTrace();
+				places.add(place);
+				
+			}
+			
+			return places;
+			
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	private JSONArray sortPlaces(List<Place> _places) throws JSONException{
+		
+		List<Place> places = new ArrayList<Place>();
+
+		for(Place place : _places){
+
+			if(place.getTalkAbout()!=null && place.getTalkAbout().intValue() > 300){
+				places.add(place);
 			}
 
 		}
